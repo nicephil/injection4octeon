@@ -1,0 +1,29 @@
+动态加载共享库文件从一个进程到另外一个运行中进程
+加载自己的共享库文件到运行中进程
+调用自定符号，函数在加载的共享文件中
+传递参数到这个函数
+
+hotpatch.h libhotpatch.so
+hotpatcher 注入一个.so到进程
+libhotpatchtest.so有一个mysym，写log到/tmp/hotpatchtest.log带时间戳
+
+用户需要编译共享库带-fPIC -nostartfiles
+
+hotpatch_t *hotpatch_create (pid_t pid, int verbose);
+目标进程pid,log级别0-6.返回一个对象包含进程当前库映射，重要函数位置
+
+int hotpatch_inject_library (hotpatch_t *hp, const char *sofile,
+        const char *symbol,
+        const unsigned char *data,
+        size_t datalen,
+        uintptr_t *out_addr,
+        uintptr_t *out_result);
+
+使用创建的hotpatch对象，跟随sofile指定的共享库，可选函数symbol跟随
+序列化参数data, datalen, 库的返回地址out_addr,symbol调用返回值out_result
+成功0，失败-1.
+
+
+void hotpatch_destroy (hotpatch_t *hp);
+释放hotpatch目标的内存和资源
+
