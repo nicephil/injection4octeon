@@ -525,10 +525,17 @@ int hotpatch_set_execution_pointer(hotpatch_t *hp, uintptr_t ptr)
 #undef HP_REG_SP
 #undef HP_REG_AX
 #if __WORDSIZE == 64
+#if OCTEON_TARGET == linux_64
+	#define HP_REG_IP_STR "RIP"
+	#define HP_REG_IP(A) A.regs[EF_REG31]
+	#define HP_REG_SP(A) A.regs[EF_REG29]
+	#define HP_REG_AX(A) A.regs[EF_REG2]
+#else
 	#define HP_REG_IP_STR "RIP"
 	#define HP_REG_IP(A) A.regs.rip
 	#define HP_REG_SP(A) A.regs.rsp
 	#define HP_REG_AX(A) A.regs.rax
+#endif
 #else
 	#define HP_REG_IP_STR "EIP"
 	#define HP_REG_IP(A) A.regs.eip
@@ -627,7 +634,7 @@ int hotpatch_inject_library(hotpatch_t *hp, const char *dll, const char *symbol,
 		uintptr_t stack[4] = { 0, 0, 0, 0}; /* max arguments of the functions we
 											   are using */
 		uintptr_t heapptr = 0;
-		int idx = 0;
+		unsigned int idx = 0;
 #undef HP_SETEXECWAITGET
 #undef HP_NULLIFYSTACK
 #undef HP_PASS_ARGS2FUNC
@@ -662,6 +669,15 @@ do { \
 		break; \
 } while (0)
 #if __WORDSIZE == 64
+#if OCTEON_TARGET == linux_64 
+	#define HP_PASS_ARGS2FUNC(A,FN,ARG1,ARG2) \
+	do { \
+		A.regs[EF_REG5] = ARG2; \
+		A.regs[EF_REG4] = ARG1; \
+		A.regs[EF_REG31] = FN; \
+		A.regs[EF_REG2] = 0; \
+	} while (0)
+#else
 	#define HP_PASS_ARGS2FUNC(A,FN,ARG1,ARG2) \
 	do { \
 		A.regs.rsi = ARG2; \
@@ -669,6 +685,7 @@ do { \
 		A.regs.rip = FN; \
 		A.regs.rax = 0; \
 	} while (0)
+#endif
 #else /* __WORDSIZE == 64 */
 	#define HP_PASS_ARGS2FUNC(A,FN,ARG1,ARG2) \
 	do { \

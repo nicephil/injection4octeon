@@ -1,3 +1,4 @@
+目的:
 动态加载共享库文件从一个进程到另外一个运行中进程
 加载自己的共享库文件到运行中进程
 调用自定符号，函数在加载的共享文件中
@@ -30,5 +31,10 @@ void hotpatch_destroy (hotpatch_t *hp);
 
 
 Compiling:
-source setbuildenv
+cd $(OCTEON_ROOT)
+source ./env-setup OCTEON_CN56XX_PASS2 --runtime-model
+
 make OCTEON_TARGET=linux_64
+
+Known Issues:
+$(OCTEON_ROOT)/common.mk没有定义$(RANLIB)，需要加入RANLAB=${CROSS_COMPILE}ranlib
