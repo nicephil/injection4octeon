@@ -38,3 +38,5 @@ make OCTEON_TARGET=linux_64
 
 Known Issues:
 $(OCTEON_ROOT)/common.mk没有定义$(RANLIB)，需要加入RANLAB=${CROSS_COMPILE}ranlib
+
+感谢Vikas在x86_64上的努力
