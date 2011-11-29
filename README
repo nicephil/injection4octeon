@@ -27,3 +27,8 @@ int hotpatch_inject_library (hotpatch_t *hp, const char *sofile,
 void hotpatch_destroy (hotpatch_t *hp);
 释放hotpatch目标的内存和资源
 
+
+
+Compiling:
+source setbuildenv
+make OCTEON_TARGET=linux_64
